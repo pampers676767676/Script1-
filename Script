@@ -1,0 +1,170 @@
+-- VD Mobile Menu v2
+local p = game:GetService("Players").LocalPlayer
+local g = Instance.new("ScreenGui", p:WaitForChild("PlayerGui"))
+g.Name, g.ResetOnSpawn = "VDMobile", false
+
+-- Главное окно
+local m = Instance.new("Frame", g)
+m.Size, m.Position = UDim2.fromScale(.85,.75), UDim2.fromScale(.075,.125)
+m.BackgroundColor3, m.BorderSizePixel = Color3.fromRGB(25,25,25), 0
+m.Active, m.Draggable = true, true
+Instance.new("UICorner", m).CornerRadius = UDim.new(0,12)
+
+-- Заголовок
+local t = Instance.new("TextLabel", m)
+t.Size, t.BackgroundTransparency = UDim2.new(1,0,0,40), 1
+t.Text, t.TextColor3, t.Font, t.TextSize = "VD Mobile", Color3.new(1,1,1), Enum.Font.GothamBold, 18
+
+-- Кнопка свернуть/развернуть (в правом верхнем углу)
+local mini = Instance.new("TextButton", m)
+mini.Size, mini.Position = UDim2.new(0,30,0,30), UDim2.new(1,-35,0,5)
+mini.BackgroundColor3, mini.Text = Color3.fromRGB(60,60,60), "—"
+mini.TextColor3, mini.Font, mini.TextSize = Color3.new(1,1,1), Enum.Font.GothamBold, 16
+Instance.new("UICorner", mini).CornerRadius = UDim.new(0,6)
+
+-- Кнопки изменения размера
+local grow = mini:Clone(); grow.Parent = m
+grow.Position, grow.Text, grow.Size = UDim2.new(1,-70,0,5), "+", UDim2.new(0,30,0,30)
+local shrink = mini:Clone(); shrink.Parent = m
+shrink.Position, shrink.Text, shrink.Size = UDim2.new(1,-105,0,5), "-", UDim2.new(0,30,0,30)
+
+-- Область с кнопками
+local c = Instance.new("ScrollingFrame", m)
+c.Size, c.Position = UDim2.new(1,-20,1,-60), UDim2.new(0,10,0,50)
+c.BackgroundTransparency, c.ScrollBarThickness = 1, 6
+local l = Instance.new("UIListLayout", c); l.Padding = UDim.new(0,8)
+
+-- Хелпер: кнопка
+local function btn(txt, fn, col)
+    local b = Instance.new("TextButton", c)
+    b.Size, b.BackgroundColor3 = UDim2.new(1,0,0,46), col or Color3.fromRGB(40,40,40)
+    b.Text, b.TextColor3, b.Font, b.TextSize = txt, Color3.new(1,1,1), Enum.Font.Gotham, 15
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
+    b.MouseButton1Click:Connect(fn)
+    return b
+end
+
+-- Хелпер: переключатель (toggle)
+local function toggle(txt, state, fn)
+    local b = btn(txt .. ": " .. (state and "ON" or "OFF"), function()
+        state = not state
+        b.Text = txt .. ": " .. (state and "ON" or "OFF")
+        b.BackgroundColor3 = state and Color3.fromRGB(0,120,60) or Color3.fromRGB(40,40,40)
+        fn(state)
+    end)
+    if state then b.BackgroundColor3 = Color3.fromRGB(0,120,60) end
+    return b
+end
+
+-- ==================== ФУНКЦИИ ====================
+
+-- === VISUALS ===
+btn("— Визуалы —", function() end, Color3.fromRGB(70,70,110))
+toggle("Survivor ESP", false, function(s) print("Survivor ESP:", s) end)
+toggle("Killer ESP", false, function(s) print("Killer ESP:", s) end)
+toggle("Generator ESP", false, function(s) print("Gen ESP:", s) end)
+toggle("Exit ESP", false, function(s) print("Exit ESP:", s) end)
+toggle("Fullbright", false, function(s) game.Lighting.Ambient = s and Color3.new(1,1,1) or Color3.fromRGB(70,70,70) end)
+toggle("Box ESP", false, function(s) print("Box:", s) end)
+toggle("Tracers", false, function(s) print("Tracers:", s) end)
+
+-- === AUTOMATION ===
+btn("— Автоматизация —", function() end, Color3.fromRGB(70,70,110))
+toggle("Auto Skill Check", false, function(s) print("AutoSkill:", s) end)
+toggle("Auto Repair", false, function(s) print("AutoRepair:", s) end)
+toggle("Auto Parry", false, function(s) print("AutoParry:", s) end)
+toggle("Auto Escape", false, function(s) print("AutoEsc:", s) end)
+toggle("Instant Heal", false, function(s) print("Heal:", s) end)
+
+-- === COMBAT ===
+btn("— Бой —", function() end, Color3.fromRGB(70,70,110))
+toggle("AimBot", false, function(s) print("Aim:", s) end)
+toggle("No Stun", false, function(s) print("NoStun:", s) end)
+toggle("No Slowdown", false, function(s) print("NoSlow:", s) end)
+toggle("Speed Hack", false, function(s)
+    local ch = p.Character
+    if ch and ch:FindFirstChild("Humanoid") then
+        ch.Humanoid.WalkSpeed = s and 30 or 16
+    end
+end)
+
+-- === MOVEMENT ===
+btn("— Движение —", function() end, Color3.fromRGB(70,70,110))
+toggle("Noclip", false, function(s) print("Noclip:", s) end)
+toggle("Fly", false, function(s) print("Fly:", s) end)
+toggle("Infinite Jump", false, function(s) print("InfJump:", s) end)
+
+-- === TELEPORT ===
+btn("— Телепорт —", function() end, Color3.fromRGB(70,70,110))
+btn("TP to Generator", function() print("TP Gen") end)
+btn("TP to Exit", function() print("TP Exit") end)
+btn("TP to Survivor", function() print("TP Surv") end)
+btn("TP to Killer", function() print("TP Killer") end)
+btn("TP to Spawn", function()
+    local ch = p.Character
+    if ch then ch:PivotTo(CFrame.new(0, 5, 0)) end
+end)
+
+-- === MISC ===
+btn("— Разное —", function() end, Color3.fromRGB(70,70,110))
+btn("Rejoin Server", function()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, p)
+end)
+btn("Server Hop", function()
+    local TS = game:GetService("TeleportService")
+    local HS = game:GetService("HttpService")
+    local ok, srvs = pcall(function()
+        return HS:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?limit=100"))
+    end)
+    if ok and srvs.data then
+        for _, s in ipairs(srvs.data) do
+            if s.playing < s.maxPlayers and s.id ~= game.JobId then
+                TS:TeleportToPlaceInstance(game.PlaceId, s.id, p); break
+            end
+        end
+    end
+end)
+btn("Copy Job ID", function()
+    if setclipboard then setclipboard(game.JobId) end
+end)
+btn("Reset Character", function()
+    local ch = p.Character
+    if ch and ch:FindFirstChild("Humanoid") then ch.Humanoid.Health = 0 end
+end)
+
+-- ==================== УПРАВЛЕНИЕ ОКНОМ ====================
+
+local minimized = false
+local prevSize = m.Size
+
+mini.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        prevSize = m.Size
+        m.Size = UDim2.new(0, 180, 0, 40)
+        c.Visible = false
+        mini.Text = "+"
+    else
+        m.Size = prevSize
+        c.Visible = true
+        mini.Text = "—"
+    end
+end)
+
+grow.MouseButton1Click:Connect(function()
+    local cur = m.Size.X.Scale
+    local newScale = math.min(cur + 0.1, 1.0)
+    m.Size = UDim2.fromScale(newScale, newScale * 0.88)
+end)
+
+shrink.MouseButton1Click:Connect(function()
+    local cur = m.Size.X.Scale
+    local newScale = math.max(cur - 0.1, 0.4)
+    m.Size = UDim2.fromScale(newScale, newScale * 0.88)
+end)
+
+-- Обновление размера скролла
+c.CanvasSize = UDim2.new(0, 0, 0, l.AbsoluteContentSize.Y)
+l:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    c.CanvasSize = UDim2.new(0, 0, 0, l.AbsoluteContentSize.Y)
+end)
